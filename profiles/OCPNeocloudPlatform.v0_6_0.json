@@ -1,0 +1,591 @@
+{
+  "SchemaDefinition": "RedfishInteroperabilityProfile.v1_10_0",
+  "ProfileName": "OCPNeocloudPlatform",
+  "ProfileVersion": "0.6.0",
+  "Purpose": "Neocloud platform (host) tier: the DMTF-standard chassis, power, thermal, drive, memory and processor health any Redfish BMC in a GPU fleet must expose so that agentless, read-only monitoring reaches every node - tenant, unprovisioned, wedged or powered off - regardless of accelerator platform. Every requirement here is collected in production today from Supermicro, Dell and Lenovo BMCs with zero probe errors [live]. Requires OCPNeocloudServiceCore.",
+  "OwningEntity": "Open Compute Project",
+  "ContributedBy": "OCP Scaling AI Clusters at Neoclouds workgroup (DRAFT); evidence from the reference collector",
+  "ContactInfo": "OCP FTI Scaling AI Clusters at Neoclouds workstream",
+  "ProfileType": "Interop",
+  "RequiredProfiles": {
+    "OCPNeocloudServiceCore": {
+      "MinVersion": "0.6.0"
+    }
+  },
+  "Protocol": {
+    "MinVersion": "1.15"
+  },
+  "Resources": {
+    "ComputerSystem": {
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "PowerState": {
+          "ReadRequirement": "Mandatory",
+          "Purpose": "Host power state from the BMC; a powered-off host with a live BMC is data, not a gap [live: A1-17]."
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {
+              "ReadRequirement": "Mandatory"
+            },
+            "State": {
+              "ReadRequirement": "Mandatory"
+            },
+            "Conditions": {
+              "ReadRequirement": "Recommended",
+              "Purpose": "Active-fault list without log scraping [gap 8.4]. Not populated by any BMC in the fleet today [rec]; Recommended so the ask is on record."
+            }
+          }
+        },
+        "SystemType": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Manufacturer": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Model": {
+          "ReadRequirement": "Mandatory"
+        },
+        "SerialNumber": {
+          "ReadRequirement": "Mandatory"
+        },
+        "SKU": {
+          "ReadRequirement": "Recommended"
+        },
+        "BiosVersion": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Processors": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Memory": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Storage": {
+          "ReadRequirement": "Recommended"
+        },
+        "MemorySummary": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "TotalSystemMemoryGiB": {
+              "ReadRequirement": "Recommended"
+            },
+            "Status": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "ProcessorSummary": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "Count": {
+              "ReadRequirement": "Recommended"
+            },
+            "Status": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "Links": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "ManagedBy": {
+              "ReadRequirement": "Mandatory"
+            },
+            "Chassis": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "LogServices": {
+          "ReadRequirement": "Mandatory"
+        },
+        "SecureBoot": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "Chassis": {
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "ChassisType": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Manufacturer": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Model": {
+          "ReadRequirement": "Mandatory"
+        },
+        "SerialNumber": {
+          "ReadRequirement": "Mandatory"
+        },
+        "PartNumber": {
+          "ReadRequirement": "Recommended"
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {
+              "ReadRequirement": "Mandatory"
+            },
+            "State": {
+              "ReadRequirement": "Mandatory"
+            },
+            "Conditions": {
+              "ReadRequirement": "Recommended",
+              "Purpose": "Active-fault list without log scraping [gap 8.4]. Not populated by any BMC in the fleet today [rec]; Recommended so the ask is on record."
+            }
+          }
+        },
+        "PowerState": {
+          "ReadRequirement": "Recommended"
+        },
+        "PowerSubsystem": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "Modern power model. Supermicro exposes PowerSubsystem and ThermalSubsystem alongside the deprecated Power and Thermal [rec]; either satisfies this profile via the resource requirements below."
+        },
+        "ThermalSubsystem": {
+          "ReadRequirement": "Recommended"
+        },
+        "EnvironmentMetrics": {
+          "ReadRequirement": "Recommended"
+        },
+        "Sensors": {
+          "ReadRequirement": "Recommended"
+        },
+        "Power": {
+          "ReadRequirement": "IfImplemented"
+        },
+        "Thermal": {
+          "ReadRequirement": "IfImplemented"
+        },
+        "Links": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "ComputerSystems": {
+              "ReadRequirement": "Recommended"
+            },
+            "ManagedBy": {
+              "ReadRequirement": "Mandatory"
+            },
+            "ContainedBy": {
+              "ReadRequirement": "Recommended",
+              "Purpose": "Power scope. A node chassis reporting 3.3 kW and its accelerator tray chassis reporting 2.3 kW are both correct; containment is what lets a client label the scope instead of double counting [rec]."
+            },
+            "Contains": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        }
+      }
+    },
+    "Power": {
+      "ReadRequirement": "IfImplemented",
+      "Purpose": "Deprecated schema, still the only power model on some shipping firmware. Requirements mirror PowerSupply/PowerSubsystem below.",
+      "PropertyRequirements": {
+        "PowerControl": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "PowerConsumedWatts": {
+              "ReadRequirement": "Mandatory"
+            },
+            "PowerCapacityWatts": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "PowerSupplies": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "MemberId": {
+              "ReadRequirement": "Mandatory"
+            },
+            "Status": {
+              "ReadRequirement": "Mandatory",
+              "PropertyRequirements": {
+                "State": {
+                  "ReadRequirement": "Mandatory",
+                  "Purpose": "An unpopulated bay shall report State=Absent so clients compare healthy supplies against installed ones, not against bay count: a 6-bay chassis with 4 supplies is correctly populated [rec]. A dead supply reports Enabled + Critical with ~5 W input [live: 13 PSUs on 11 nodes]."
+                },
+                "Health": {
+                  "ReadRequirement": "Mandatory"
+                }
+              }
+            },
+            "PowerInputWatts": {
+              "ReadRequirement": "Recommended"
+            },
+            "PowerOutputWatts": {
+              "ReadRequirement": "Recommended"
+            },
+            "LineInputVoltage": {
+              "ReadRequirement": "Recommended"
+            },
+            "PowerCapacityWatts": {
+              "ReadRequirement": "Recommended"
+            },
+            "Model": {
+              "ReadRequirement": "Recommended"
+            },
+            "SerialNumber": {
+              "ReadRequirement": "Recommended"
+            },
+            "FirmwareVersion": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        }
+      }
+    },
+    "PowerSubsystem": {
+      "ReadRequirement": "IfImplemented",
+      "PropertyRequirements": {
+        "PowerSupplies": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Status": {
+          "ReadRequirement": "Recommended"
+        },
+        "CapacityWatts": {
+          "ReadRequirement": "Recommended"
+        },
+        "Allocation": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "PowerSupply": {
+      "ReadRequirement": "IfImplemented",
+      "PropertyRequirements": {
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "State": {
+              "ReadRequirement": "Mandatory",
+              "Purpose": "Absent for an empty bay; see Power.PowerSupplies."
+            },
+            "Health": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "Metrics": {
+          "ReadRequirement": "Recommended"
+        },
+        "Model": {
+          "ReadRequirement": "Recommended"
+        },
+        "SerialNumber": {
+          "ReadRequirement": "Recommended"
+        },
+        "FirmwareVersion": {
+          "ReadRequirement": "Recommended"
+        },
+        "PowerCapacityWatts": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "PowerSupplyMetrics": {
+      "ReadRequirement": "IfImplemented",
+      "PropertyRequirements": {
+        "InputPowerWatts": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "Reading": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "OutputPowerWatts": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "Reading": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "InputVoltage": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "Reading": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        }
+      }
+    },
+    "Thermal": {
+      "ReadRequirement": "IfImplemented",
+      "PropertyRequirements": {
+        "Temperatures": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "MemberId": {
+              "ReadRequirement": "Mandatory"
+            },
+            "ReadingCelsius": {
+              "ReadRequirement": "Mandatory"
+            },
+            "Status": {
+              "ReadRequirement": "Mandatory"
+            },
+            "PhysicalContext": {
+              "ReadRequirement": "Recommended",
+              "Purpose": "OCPServerHardwareManagement 1.0.0 requires CPU, Intake and SystemBoard contexts; a GPU server may report CPU, GPU and SystemBoard only [rec: Dell]. This profile does not constrain the value set."
+            },
+            "UpperThresholdCritical": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "Fans": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "MemberId": {
+              "ReadRequirement": "Mandatory"
+            },
+            "Reading": {
+              "ReadRequirement": "Mandatory"
+            },
+            "ReadingUnits": {
+              "ReadRequirement": "Recommended"
+            },
+            "Status": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        }
+      }
+    },
+    "ThermalSubsystem": {
+      "ReadRequirement": "IfImplemented",
+      "PropertyRequirements": {
+        "Fans": {
+          "ReadRequirement": "Mandatory"
+        },
+        "ThermalMetrics": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Status": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "ThermalMetrics": {
+      "ReadRequirement": "IfImplemented",
+      "PropertyRequirements": {
+        "TemperatureSummaryCelsius": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "Intake": {
+              "ReadRequirement": "Recommended"
+            },
+            "Exhaust": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "TemperatureReadingsCelsius": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "Fan": {
+      "ReadRequirement": "IfImplemented",
+      "PropertyRequirements": {
+        "Status": {
+          "ReadRequirement": "Mandatory"
+        },
+        "SpeedPercent": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "Reading": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        }
+      }
+    },
+    "EnvironmentMetrics": {
+      "ReadRequirement": "Recommended",
+      "Purpose": "Chassis-level power and energy for showback and capacity: fleet chassis-consumed power is a sum over this or PowerControl [live: 555.5 kW at Site A].",
+      "PropertyRequirements": {
+        "PowerWatts": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "Reading": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "EnergykWh": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "Reading": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "TemperatureCelsius": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "Reading": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        }
+      }
+    },
+    "Sensor": {
+      "ReadRequirement": "Recommended",
+      "PropertyRequirements": {
+        "Reading": {
+          "ReadRequirement": "Mandatory"
+        },
+        "ReadingType": {
+          "ReadRequirement": "Mandatory"
+        },
+        "ReadingUnits": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory"
+        },
+        "PhysicalContext": {
+          "ReadRequirement": "Recommended"
+        },
+        "Thresholds": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "Processor": {
+      "ReadRequirement": "Recommended",
+      "Purpose": "Host CPUs: presence and health only. Accelerator requirements are in OCPNeocloudAccelerator.",
+      "PropertyRequirements": {
+        "ProcessorType": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {
+              "ReadRequirement": "Mandatory"
+            },
+            "State": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "Model": {
+          "ReadRequirement": "Recommended"
+        },
+        "Manufacturer": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "Memory": {
+      "ReadRequirement": "Recommended",
+      "Purpose": "Host DIMMs: presence and health.",
+      "PropertyRequirements": {
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {
+              "ReadRequirement": "Mandatory"
+            },
+            "State": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "CapacityMiB": {
+          "ReadRequirement": "Recommended"
+        },
+        "MemoryDeviceType": {
+          "ReadRequirement": "Recommended"
+        },
+        "Manufacturer": {
+          "ReadRequirement": "Recommended"
+        },
+        "PartNumber": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "Storage": {
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "Drives": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory"
+        },
+        "StorageControllers": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "Drive": {
+      "ReadRequirement": "Mandatory",
+      "Purpose": "Coarse drive health for nodes where nvme-cli can never run. 5 fields versus 74 from an in-band SMART collector, but non-zero where there is otherwise nothing [gap 2.3].",
+      "PropertyRequirements": {
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {
+              "ReadRequirement": "Mandatory"
+            },
+            "State": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "FailurePredicted": {
+          "ReadRequirement": "Mandatory"
+        },
+        "PredictedMediaLifeLeftPercent": {
+          "ReadRequirement": "Recommended"
+        },
+        "CapacityBytes": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Protocol": {
+          "ReadRequirement": "Mandatory"
+        },
+        "MediaType": {
+          "ReadRequirement": "Recommended"
+        },
+        "Model": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Revision": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "Drive firmware version, for fleet consistency."
+        },
+        "SerialNumber": {
+          "ReadRequirement": "Recommended"
+        },
+        "PhysicalLocation": {
+          "ReadRequirement": "Recommended"
+        },
+        "NVMe": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "Where the BMC can read NVMe SMART (Dell exposes it through the NVMeSMARTData telemetry report [rec]), surface it; critical-warning, percentage-used and media errors are the fields the in-band model alerts on."
+        }
+      }
+    }
+  },
+  "Registries": {
+    "Base": {
+      "MinVersion": "1.0.0",
+      "Repository": "redfish.dmtf.org/registries",
+      "Messages": {}
+    }
+  }
+}

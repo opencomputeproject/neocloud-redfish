@@ -1,0 +1,776 @@
+{
+  "SchemaDefinition": "RedfishInteroperabilityProfile.v1_6_0",
+  "ProfileName": "OCP_UBB_BaselineManagement",
+  "ProfileVersion": "2.0.0",
+  "Purpose": "Specifies the baseline manageability requirements GPU-based Universal BaseBoard (UBB).",
+  "OwningEntity": "Open Compute Project",
+  "ContactInfo": "https://github.com/opencomputeproject/ocp-hm-system-gpu-management",
+  "License": "Creative Commons Attribution-ShareAlike 4.0 International License",
+  "Protocol": {
+    "MinVersion": "1.0"
+  },
+  "Resources": {
+    "Assembly": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "Assemblies": {}
+      }
+    },
+    "Certificate": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "CertificateString": {},
+        "CertificateType": {},
+        "CertificateUsageTypes": {}
+      }
+    },
+    "Chassis": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Supported",
+      "PropertyRequirements": {
+        "Assembly": {
+          "ReadRequirement": "Supported"
+        },
+        "ChassisType": {
+          "ReadRequirement": "Recommended"
+        },
+        "EnvironmentMetrics": {
+          "ReadRequirement": "Supported"
+        },
+        "Links": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "ComputerSystems": {
+              "ReadRequirement": "Supported"
+            },
+            "ContainedBy": {
+              "ReadRequirement": "Supported"
+            },
+            "Contains": {
+              "ReadRequirement": "Supported"
+            },
+            "ManagedBy": {
+              "ReadRequirement": "Supported"
+            },
+            "Processors": {
+              "ReadRequirement": "Supported"
+            }
+          }
+        },
+        "Manufacturer": {
+          "ReadRequirement": "Supported"
+        },
+        "MaxPowerWatts": {
+          "ReadRequirement": "Supported"
+        },
+        "MinPowerWatts": {
+          "ReadRequirement": "Supported"
+        },
+        "Model": {
+          "ReadRequirement": "Supported"
+        },
+        "PCIeDevices": {
+          "ReadRequirement": "Supported"
+        },
+        "PartNumber": {
+          "ReadRequirement": "Supported"
+        },
+        "PowerSubsystem": {
+          "ReadRequirement": "Supported"
+        },
+        "SKU": {
+          "ReadRequirement": "Supported"
+        },
+        "Sensors": {
+          "ReadRequirement": "Supported"
+        },
+        "SerialNumber": {
+          "ReadRequirement": "Supported"
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {},
+            "State": {}
+          }
+        },
+        "ThermalSubsystem": {
+          "ReadRequirement": "Supported"
+        },
+        "UUID": {
+          "ReadRequirement": "Supported"
+        }
+      }
+    },
+    "ComputerSystem": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "Links": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Chassis": {},
+            "ManagedBy": {}
+          }
+        },
+        "LogServices": {},
+        "Memory": {},
+        "Processors": {},
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {},
+            "State": {}
+          }
+        },
+        "SystemType": {}
+      }
+    },
+    "EnvironmentMetrics": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Supported",
+      "PropertyRequirements": {
+        "EnergyJoules": {
+          "ReadRequirement": "Supported",
+          "PropertyRequirements": {
+            "DataSourceUri": {
+              "ReadRequirement": "Supported"
+            },
+            "Reading": {
+              "ReadRequirement": "Supported"
+            }
+          }
+        },
+        "PowerLimitWatts": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "ControlMode": {
+              "ReadRequirement": "Recommended"
+            },
+            "SetPoint": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "TemperatureCelsius": {
+          "ReadRequirement": "Supported",
+          "PropertyRequirements": {
+            "DataSourceUri": {
+              "ReadRequirement": "Supported"
+            },
+            "Reading": {
+              "ReadRequirement": "Supported"
+            }
+          }
+        }
+      }
+    },
+    "LogEntry": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Supported",
+      "PropertyRequirements": {
+        "AdditionalDataURI": {
+          "ReadRequirement": "Supported"
+        },
+        "Created": {
+          "ReadRequirement": "Recommended"
+        },
+        "EntryType": {},
+        "OriginOfCondition": {
+          "ReadRequirement": "Supported"
+        },
+        "Message": {
+          "ReadRequirement": "Recommended"
+        },
+        "MessageArgs": {
+          "ReadRequirement": "Supported"
+        },
+        "MessageId": {
+          "ReadRequirement": "Supported"
+        },
+        "Resolution": {
+          "ReadRequirement": "Supported"
+        },
+        "Severity": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "LogEntryCollection": {
+      "ReadRequirement": "Mandatory",
+      "URIs": [],
+      "PropertyRequirements": {
+        "Description": {},
+        "Members": {
+          "ReadRequirement": "Mandatory",
+          "MinCount": 1
+        },
+        "Members@odata.count": {}
+      }
+    },
+    "LogService": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "Description": {},
+        "Entries": {
+          "ReadRequirement": "Recommended"
+        },
+        "MaxNumberOfRecords": {
+          "ReadRequirement": "Recommended"
+        },
+        "OverWritePolicy": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "LogServiceCollection": {
+      "ReadRequirement": "Mandatory",
+      "URIs": [],
+      "PropertyRequirements": {
+        "Description": {},
+        "Members": {
+          "ReadRequirement": "Mandatory",
+          "MinCount": 1
+        },
+        "Members@odata.count": {}
+      }
+    },
+    "Manager": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Recommended",
+      "PropertyRequirements": {
+        "DateTime": {
+          "ReadRequirement": "Recommended"
+        },
+        "DateTimeLocalOffset": {
+          "ReadRequirement": "Recommended"
+        },
+        "Description": {},
+        "FirmwareVersion": {
+          "ReadRequirement": "Recommended"
+        },
+        "LastResetTime": {
+          "ReadRequirement": "Recommended"
+        },
+        "Links": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "ManagerInChassis": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "ManagerType": {},
+        "ServiceEntryPointUUID": {
+          "ReadRequirement": "Recommended"
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {},
+            "State": {}
+          }
+        },
+        "UUID": {
+          "ReadRequirement": "Recommended"
+        }
+      },
+      "ActionRequirements": {
+        "Reset": {
+          "ReadRequirement": "Recommended",
+          "Parameters": {}
+        },
+        "ResetToDefaults": {
+          "ReadRequirement": "Recommended",
+          "Parameters": {
+            "ResetType": {
+              "ParameterValues": [],
+              "RecommendedValues": [],
+              "ReadRequirement": "Recommended"
+            }
+          }
+        }
+      }
+    },
+    "ManagerCollection": {
+      "ReadRequirement": "Mandatory",
+      "URIs": [],
+      "PropertyRequirements": {
+        "Members": {
+          "ReadRequirement": "Mandatory",
+          "MinCount": 1
+        },
+        "Members@odata.count": {}
+      }
+    },
+    "Memory": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "AllowedSpeedsMHz": {},
+        "CapacityMiB": {},
+        "ErrorCorrection": {},
+        "MemoryDeviceType": {},
+        "Metrics": {}
+      }
+    },
+    "MemoryCollection": {
+      "ReadRequirement": "Mandatory",
+      "URIs": [],
+      "PropertyRequirements": {
+        "Members": {
+          "ReadRequirement": "Mandatory",
+          "MinCount": 1
+        },
+        "Members@odata.count": {}
+      }
+    },
+    "MemoryMetrics": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "BandwidthPercent": {}
+      }
+    },
+    "MetricReport": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "MetricReportDefinition": {},
+        "MetricValues": {}
+      }
+    },
+    "MetricReportCollection": {
+      "ReadRequirement": "Mandatory",
+      "URIs": [],
+      "PropertyRequirements": {
+        "Members": {
+          "ReadRequirement": "Mandatory",
+          "MinCount": 1
+        },
+        "Members@odata.count": {}
+      }
+    },
+    "MetricReportDefinition": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "MetricReport": {},
+        "ReportUpdates": {},
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "State": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        }
+      }
+    },
+    "MetricReportDefinitionCollection": {
+      "ReadRequirement": "Mandatory",
+      "URIs": [],
+      "PropertyRequirements": {
+        "Members": {
+          "ReadRequirement": "Mandatory",
+          "MinCount": 1
+        },
+        "Members@odata.count": {}
+      }
+    },
+    "PCIeDevice": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "DeviceType": {},
+        "Manufacturer": {
+          "ReadRequirement": "Recommended"
+        },
+        "Model": {
+          "ReadRequirement": "Recommended"
+        },
+        "PCIeFunctions": {
+          "ReadRequirement": "Recommended"
+        },
+        "PCIeInterface": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "MaxLanes": {},
+            "MaxPCIeType": {}
+          }
+        },
+        "PartNumber": {
+          "ReadRequirement": "Recommended"
+        },
+        "SerialNumber": {
+          "ReadRequirement": "Recommended"
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {},
+            "State": {}
+          }
+        },
+        "UUID": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "PCIeDeviceCollection": {
+      "ReadRequirement": "Mandatory",
+      "URIs": [],
+      "PropertyRequirements": {
+        "Members": {
+          "ReadRequirement": "Mandatory",
+          "MinCount": 1
+        },
+        "Members@odata.count": {}
+      }
+    },
+    "PCIeFunction": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "DeviceId": {},
+        "SubsystemId": {},
+        "SubsystemVendorId": {},
+        "VendorId": {}
+      }
+    },
+    "Port": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "CurrentSpeedGbps": {},
+        "LinkState": {
+          "ReadRequirement": "Recommended"
+        },
+        "LinkStatus": {
+          "ReadRequirement": "Recommended"
+        },
+        "MaxSpeedGbps": {
+          "ReadRequirement": "Recommended"
+        },
+        "Metrics": {},
+        "PortProtocol": {},
+        "PortType": {},
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {},
+            "State": {}
+          }
+        }
+      }
+    },
+    "PortMetrics": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Supported",
+      "PropertyRequirements": {
+        "RXBytes": {
+          "ReadRequirement": "Supported"
+        },
+        "TXBytes": {
+          "ReadRequirement": "Supported"
+        }
+      }
+    },
+    "Processor": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "EnvironmentMetrics": {},
+        "Links": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Chassis": {},
+            "Memory": {
+              "ReadRequirement": "Recommended"
+            },
+            "PCIeDevice": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "Location": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "PartLocation": {
+              "ReadRequirement": "Mandatory",
+              "PropertyRequirements": {
+                "ServiceLabel": {
+                  "ReadRequirement": "Recommended"
+                }
+              }
+            }
+          }
+        },
+        "Manufacturer": {},
+        "MemorySummary": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "Metrics": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "Metrics": {
+          "ReadRequirement": "Recommended"
+        },
+        "MinSpeedMHz": {
+          "ReadRequirement": "Recommended"
+        },
+        "Model": {
+          "ReadRequirement": "Recommended"
+        },
+        "PartNumber": {
+          "ReadRequirement": "Recommended"
+        },
+        "Ports": {},
+        "ProcessorType": {},
+        "SerialNumber": {
+          "ReadRequirement": "Recommended"
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {},
+            "State": {}
+          }
+        },
+        "SystemInterface": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "PCIe": {
+              "ReadRequirement": "Recommended",
+              "PropertyRequirements": {
+                "MaxLanes": {
+                  "ReadRequirement": "Recommended"
+                },
+                "MaxPCIeType": {
+                  "ReadRequirement": "Recommended"
+                },
+                "PCIeType": {
+                  "ReadRequirement": "Recommended"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ProcessorCollection": {
+      "ReadRequirement": "Mandatory",
+      "URIs": [],
+      "PropertyRequirements": {
+        "Members": {
+          "ReadRequirement": "Mandatory",
+          "MinCount": 1
+        },
+        "Members@odata.count": {}
+      }
+    },
+    "Sensor": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "Reading": {},
+        "ReadingType": {
+          "ReadRequirement": "Recommended"
+        },
+        "ReadingUnits": {},
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {},
+            "State": {}
+          }
+        },
+        "Thresholds": {
+          "ReadRequirement": "Supported",
+          "PropertyRequirements": {
+            "LowerCaution": {
+              "ReadRequirement": "Supported",
+              "PropertyRequirements": {
+                "Reading": {
+                  "ReadRequirement": "Supported"
+                }
+              }
+            },
+            "LowerCritical": {
+              "ReadRequirement": "Supported",
+              "PropertyRequirements": {
+                "Reading": {
+                  "ReadRequirement": "Supported"
+                }
+              }
+            },
+            "LowerFatal": {
+              "ReadRequirement": "Supported",
+              "PropertyRequirements": {
+                "Reading": {
+                  "ReadRequirement": "Supported"
+                }
+              }
+            },
+            "UpperCritical": {
+              "ReadRequirement": "Supported",
+              "PropertyRequirements": {
+                "Reading": {
+                  "ReadRequirement": "Supported"
+                }
+              }
+            },
+            "UpperFatal": {
+              "ReadRequirement": "Supported",
+              "PropertyRequirements": {
+                "Reading": {
+                  "ReadRequirement": "Supported"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "SensorCollection": {
+      "ReadRequirement": "Mandatory",
+      "URIs": [],
+      "PropertyRequirements": {
+        "Members": {
+          "ReadRequirement": "Mandatory",
+          "MinCount": 1
+        },
+        "Members@odata.count": {}
+      }
+    },
+    "ServiceRoot": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "Chassis": {},
+        "RedfishVersion": {},
+        "Systems": {},
+        "TelemetryService": {},
+        "UUID": {},
+        "UpdateService": {}
+      }
+    },
+    "SoftwareInventory": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Recommended",
+      "PropertyRequirements": {
+        "Manufacturer": {
+          "ReadRequirement": "Recommended"
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {
+              "ReadRequirement": "Recommended"
+            },
+            "State": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "Updateable": {},
+        "Version": {},
+        "WriteProtected": {
+          "ReadRequirement": "Supported"
+        }
+      }
+    },
+    "SoftwareInventoryCollection": {
+      "ReadRequirement": "Mandatory",
+      "URIs": [],
+      "PropertyRequirements": {
+        "Members": {
+          "ReadRequirement": "Mandatory",
+          "MinCount": 1
+        },
+        "Members@odata.count": {}
+      }
+    },
+    "TelemetryService": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "MaxReports": {},
+        "MetricReportDefinitions": {},
+        "MetricReports": {},
+        "MinCollectionInterval": {},
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "State": {}
+          }
+        }
+      }
+    },
+    "ThermalMetrics": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "TemperatureReadingsCelsius": {}
+      }
+    },
+    "ThermalSubsystem": {
+      "MinVersion": "1.0.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {},
+            "State": {}
+          }
+        },
+        "ThermalMetrics": {}
+      }
+    },
+    "UpdateService": {
+      "MinVersion": "1.6.0",
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "FirmwareInventory": {
+          "ReadRequirement": "Mandatory"
+        },
+        "ServiceEnabled": {
+          "ReadRequirement": "Mandatory"
+        },
+        "SoftwareInventory": {
+          "ReadRequirement": "Mandatory"
+        },
+        "MultipartHttpPushUri": {}
+      },
+      "ActionRequirements": {
+        "SimpleUpdate": {
+          "ReadRequirement": "IfImplemented",
+          "Purpose": "Minimal set to allow power on, off and reboot.",
+          "Parameters": {
+            "TransferProtocol": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        }
+      }
+    }
+  },
+  "Registries": {
+    "Base": {
+      "MinVersion": "1.0.0",
+      "Repository": "redfish.dmtf.org/registries",
+      "Messages": {
+        "Success": {},
+        "GeneralError": {},
+        "Created": {},
+        "PropertyDuplicate": {}
+      }
+    }
+  }
+}

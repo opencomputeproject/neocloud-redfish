@@ -1,0 +1,4 @@
+logs/
+logs-*.out
+__pycache__/
+evidence-props.json

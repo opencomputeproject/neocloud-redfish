@@ -1,0 +1,518 @@
+{
+  "SchemaDefinition": "RedfishInteroperabilityProfile.v1_10_0",
+  "ProfileName": "OCPNeocloudServiceCore",
+  "ProfileVersion": "0.6.0",
+  "Purpose": "Neocloud service-plane core. Composes the approved OCP Service Baseline, Baseline Hardware Management and Server Hardware Management profiles and tightens what fleet-scale, agentless, read-only monitoring needs: pre-authentication identity, a query-parameter floor, subordinate-manager liveness, firmware inventory as the fleet-consistency source, eventing, RBAC and an audit log. Required by OCPNeocloudPlatform and OCPNeocloudAccelerator. Level: Neocloud-Core = Mandatory items; Neocloud-Trusted = Recommended items.",
+  "OwningEntity": "Open Compute Project",
+  "ContributedBy": "OCP Scaling AI Clusters at Neoclouds workgroup (DRAFT); evidence from the reference collector",
+  "ContactInfo": "OCP FTI Scaling AI Clusters at Neoclouds workstream",
+  "ProfileType": "Interop",
+  "RequiredProfiles": {
+    "OCPServiceBaseline": {
+      "MinVersion": "1.0.0",
+      "Repository": "github.com/opencomputeproject/HWMgmt-OCP-Profiles"
+    },
+    "OCPBaselineHardwareManagement": {
+      "MinVersion": "1.1.0",
+      "Repository": "github.com/opencomputeproject/HWMgmt-OCP-Profiles"
+    },
+    "OCPServerHardwareManagement": {
+      "MinVersion": "1.0.0",
+      "Repository": "github.com/opencomputeproject/HWMgmt-OCP-Profiles"
+    }
+  },
+  "Protocol": {
+    "MinVersion": "1.15",
+    "ExpandQuery": "Recommended",
+    "SelectQuery": "Recommended",
+    "FilterQuery": "Recommended",
+    "ExcerptQuery": "Recommended",
+    "OnlyQuery": "Mandatory",
+    "DeepPATCH": "None",
+    "DeepPOST": "None"
+  },
+  "Resources": {
+    "ServiceRoot": {
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "RedfishVersion": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Vendor": {
+          "ReadRequirement": "Mandatory",
+          "Purpose": "Pre-authentication vendor fingerprint. Null on Supermicro JBOF firmware, where Oem is the reliable fingerprint [sweep]."
+        },
+        "UUID": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "Dell iDRAC reports no UUID and exposes ServiceIdentification instead [rec]; either identifier satisfies the identity requirement below."
+        },
+        "ServiceIdentification": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "A per-chassis identifier readable without a credential. 121 of 121 Redfish BMCs in a 259-address sweep carried a unique identifier (UUID or service tag) unauthenticated, zero collisions [sweep]. Lets a client confirm the machine at an address before spending a credential."
+        },
+        "ProtocolFeaturesSupported": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "ExpandQuery": {
+              "ReadRequirement": "Mandatory",
+              "PropertyRequirements": {
+                "Levels": {
+                  "ReadRequirement": "Mandatory"
+                },
+                "MaxLevels": {
+                  "ReadRequirement": "Mandatory",
+                  "Purpose": "Fleet-scale cost is set by expand depth: MaxLevels=1 (iDRAC9) forces a per-resource walk of 8 GPUs, p50 6.7 s per node; MaxLevels=3 (Supermicro) or bulk MetricReports give p50 1.7 s [live]. A value of 2 or more, or bulk MetricReports covering every accelerator ProcessorMetrics and MemoryMetrics, is the Neocloud-Trusted expectation."
+                }
+              }
+            },
+            "SelectQuery": {
+              "ReadRequirement": "Recommended"
+            },
+            "FilterQuery": {
+              "ReadRequirement": "Recommended"
+            },
+            "ExcerptQuery": {
+              "ReadRequirement": "Recommended",
+              "Purpose": "Present on Supermicro 1.22.2, absent on iDRAC9 1.20.1 [rec]."
+            },
+            "OnlyMemberQuery": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "Systems": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Chassis": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Managers": {
+          "ReadRequirement": "Mandatory"
+        },
+        "SessionService": {
+          "ReadRequirement": "Mandatory"
+        },
+        "AccountService": {
+          "ReadRequirement": "Mandatory"
+        },
+        "EventService": {
+          "ReadRequirement": "Mandatory"
+        },
+        "UpdateService": {
+          "ReadRequirement": "Mandatory"
+        },
+        "CertificateService": {
+          "ReadRequirement": "Mandatory"
+        },
+        "TelemetryService": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "License- or configuration-gated on several OEMs (Dell iDRAC Datacenter license; ServiceEnabled=false shipped fleet-wide until an ops PATCH [rec]). Content requirements live in OCPNeocloudAccelerator and are conditional."
+        },
+        "LicenseService": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "Makes telemetry/feature licensing auditable. Advertised by Supermicro, Dell and Lenovo, absent on AMI MegaRAC [sweep]."
+        },
+        "ComponentIntegrity": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "SPDM attestation roots (13-21 ERoT/IRoT members per HGX node [rec]). Neocloud-Trusted. Advertised but empty on AMI MegaRAC PCIe boxes [sweep] - a link is not proof."
+        },
+        "AggregationService": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "The standard form of the host-BMC to accelerator-controller relationship (DSP0266 s16). No BMC in the fleet implements it; Supermicro aggregates the NVIDIA HMC implicitly into its own tree and AggregationService 404s [rec]."
+        }
+      }
+    },
+    "Manager": {
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "ManagerType": {
+          "ReadRequirement": "Mandatory"
+        },
+        "FirmwareVersion": {
+          "ReadRequirement": "Mandatory",
+          "Purpose": "Firmware band, not model, decides the Redfish tree: HMC 25.02 enumerates 25 firmware components, 25.05 and 26.04 enumerate 34 [live]. Clients key norms on this value."
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {
+              "ReadRequirement": "Mandatory"
+            },
+            "State": {
+              "ReadRequirement": "Mandatory",
+              "Purpose": "Subordinate managers (an accelerator management controller aggregated by the host BMC) shall appear as Manager members, and their unavailability shall be expressed here (UnavailableOffline or Absent) rather than only as HTTP 503 on their subtree. Two HGX trays detached in six weeks (A1-69 Aug 2026, undetected 9 days; A1-17 2026-09-20) while the host BMC answered 200 [live]."
+            },
+            "Conditions": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "Links": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "ManagerForServers": {
+              "ReadRequirement": "Recommended"
+            },
+            "ManagerForChassis": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        },
+        "DateTime": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "Accelerator event logs carry 2020-01-01 timestamps before the controller has NTP [rec]; clients must be able to detect an unsynchronized manager clock."
+        },
+        "LogServices": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "SessionService": {
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "SessionTimeout": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Sessions": {
+          "ReadRequirement": "Mandatory"
+        }
+      }
+    },
+    "Session": {
+      "ReadRequirement": "Mandatory",
+      "Purpose": "Audit identity: who connected, from where, when.",
+      "PropertyRequirements": {
+        "UserName": {
+          "ReadRequirement": "Mandatory"
+        },
+        "ClientOriginIPAddress": {
+          "ReadRequirement": "Recommended"
+        },
+        "CreatedTime": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "AccountService": {
+      "ReadRequirement": "Mandatory",
+      "Purpose": "RBAC and least privilege on the management interface. A read-only role whose privilege cannot change hardware state is the Core credential [gap 2.2].",
+      "PropertyRequirements": {
+        "Accounts": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Roles": {
+          "ReadRequirement": "Mandatory"
+        },
+        "LDAP": {
+          "ReadRequirement": "Recommended"
+        },
+        "ActiveDirectory": {
+          "ReadRequirement": "Recommended"
+        },
+        "OAuth2": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "Delegated auth / SSO (DSP0266 s13.4.4)."
+        },
+        "MultiFactorAuth": {
+          "ReadRequirement": "Recommended"
+        },
+        "AccountLockoutThreshold": {
+          "ReadRequirement": "Recommended"
+        },
+        "MinPasswordLength": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "Role": {
+      "ReadRequirement": "Mandatory",
+      "Purpose": "The monitoring credential is a ReadOnly role whose privileges cannot change hardware state, verified at the role, not in collector code [gap 2.2]. Demoting a shared account to read-only has broken provisioning tooling that depended on it [live]; a distinct predefined ReadOnly role avoids that.",
+      "PropertyRequirements": {
+        "RoleId": {
+          "ReadRequirement": "Mandatory",
+          "MinSupportValues": [
+            "ReadOnly"
+          ]
+        },
+        "AssignedPrivileges": {
+          "ReadRequirement": "Mandatory"
+        },
+        "IsPredefined": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "EventService": {
+      "ReadRequirement": "Mandatory",
+      "Purpose": "Push eventing to monitoring and SIEM. Advertised by every BMC vendor in the fleet [sweep]; content below is the floor.",
+      "PropertyRequirements": {
+        "ServiceEnabled": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Subscriptions": {
+          "ReadRequirement": "Mandatory"
+        },
+        "ServerSentEventUri": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "SSE stream of events and metric reports; present on the NVIDIA HMC surface [rec]."
+        },
+        "IncludeOriginOfConditionSupported": {
+          "ReadRequirement": "Recommended"
+        },
+        "RegistryPrefixes": {
+          "ReadRequirement": "Recommended"
+        },
+        "ResourceTypes": {
+          "ReadRequirement": "Recommended"
+        }
+      },
+      "ActionRequirements": {
+        "SubmitTestEvent": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "EventDestination": {
+      "ReadRequirement": "IfImplemented",
+      "PropertyRequirements": {
+        "Destination": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Protocol": {
+          "ReadRequirement": "Mandatory"
+        },
+        "SubscriptionType": {
+          "ReadRequirement": "Mandatory"
+        },
+        "EventFormatType": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "MetricReport format for streamed telemetry."
+        },
+        "IncludeOriginOfCondition": {
+          "ReadRequirement": "Recommended"
+        },
+        "DeliveryRetryPolicy": {
+          "ReadRequirement": "Recommended"
+        },
+        "SyslogFilters": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "Forward security/audit events to a SIEM."
+        }
+      }
+    },
+    "LogService": {
+      "ReadRequirement": "Mandatory",
+      "Purpose": "At least one LogService whose LogPurposes contains Security, capturing privileged actions with actor identity [gap 2.2]; and the platform/accelerator event logs consumed as logs, not metrics.",
+      "PropertyRequirements": {
+        "Entries": {
+          "ReadRequirement": "Mandatory"
+        },
+        "LogPurposes": {
+          "ReadRequirement": "Recommended"
+        },
+        "ServiceEnabled": {
+          "ReadRequirement": "Recommended"
+        },
+        "DateTime": {
+          "ReadRequirement": "Recommended"
+        }
+      },
+      "ActionRequirements": {
+        "ClearLog": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "LogEntry": {
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "Created": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Severity": {
+          "ReadRequirement": "Mandatory"
+        },
+        "Message": {
+          "ReadRequirement": "Mandatory"
+        },
+        "MessageId": {
+          "ReadRequirement": "Mandatory",
+          "Purpose": "Accelerator RAS events (XID, SXID, strap mismatch) arrive today as free text inside ResourceEvent.1.0.ResourceErrorsDetected [rec]. A MessageId from an accelerator RAS registry (OCPAcceleratorRAS, AcceleratorFabric) is what makes them alertable."
+        },
+        "MessageArgs": {
+          "ReadRequirement": "Recommended"
+        },
+        "OriginOfCondition": {
+          "ReadRequirement": "Recommended"
+        },
+        "Originator": {
+          "ReadRequirement": "Recommended"
+        },
+        "OriginatorType": {
+          "ReadRequirement": "Recommended"
+        },
+        "AdditionalDataURI": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "CPER / diagnostic payload per OCP GPU & Accelerator RAS Requirements 1.7."
+        },
+        "VendorCode": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "Redfish 2026.2 (LogEntry v1.22, Condition, Event, Message) added VendorCode: the standard place for an NVIDIA XID/SXID or AMD RAS code alongside a neutral MessageId, instead of free text. Neocloud-Trusted."
+        },
+        "DiagnosticDataType": {
+          "ReadRequirement": "Recommended",
+          "Purpose": "CPER / CPERSection / Device (2025.1) so accelerator CPER records land in a standard, filterable place."
+        },
+        "CPER": {
+          "ReadRequirement": "Recommended",
+          "PropertyRequirements": {
+            "NotificationType": {
+              "ReadRequirement": "Recommended"
+            },
+            "SectionType": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        }
+      }
+    },
+    "UpdateService": {
+      "ReadRequirement": "Mandatory",
+      "Purpose": "Firmware inventory is the fleet-consistency and component-census source; multipart push is the update mechanism (aligned with OCP_UBB_BaselineManagement 2.0.0).",
+      "PropertyRequirements": {
+        "ServiceEnabled": {
+          "ReadRequirement": "Mandatory"
+        },
+        "FirmwareInventory": {
+          "ReadRequirement": "Mandatory",
+          "Purpose": "Shall enumerate every field-updatable component the service manages, including every component of an aggregated accelerator subsystem (HGX: BMC, ERoTs, FPGA, 8 GPUs, InfoROMs, NVSwitches, NVLink NIC, 8 retimers = 34 members) [rec]. A member count that falls below the node's own recent value is how a silently degraded tray is caught [live]."
+        },
+        "MultipartHttpPushUri": {
+          "ReadRequirement": "Mandatory"
+        },
+        "SoftwareInventory": {
+          "ReadRequirement": "Recommended"
+        }
+      },
+      "ActionRequirements": {
+        "SimpleUpdate": {
+          "ReadRequirement": "Recommended",
+          "Parameters": {
+            "ImageURI": {
+              "ReadRequirement": "Mandatory"
+            },
+            "Targets": {
+              "ReadRequirement": "Recommended"
+            },
+            "TransferProtocol": {
+              "ReadRequirement": "Recommended"
+            }
+          }
+        }
+      }
+    },
+    "SoftwareInventory": {
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "Version": {
+          "ReadRequirement": "Mandatory",
+          "Purpose": "Fleet firmware-consistency reconciliation (driver/firmware version drift is a ClusterMAX Reliability item) [gap 2.1]."
+        },
+        "Status": {
+          "ReadRequirement": "Mandatory",
+          "PropertyRequirements": {
+            "Health": {
+              "ReadRequirement": "Recommended"
+            },
+            "State": {
+              "ReadRequirement": "Mandatory"
+            }
+          }
+        },
+        "Updateable": {
+          "ReadRequirement": "Recommended"
+        },
+        "SoftwareId": {
+          "ReadRequirement": "Recommended"
+        },
+        "RelatedItem": {
+          "ReadRequirement": "Recommended"
+        },
+        "Manufacturer": {
+          "ReadRequirement": "Recommended"
+        },
+        "ReleaseDate": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "CertificateService": {
+      "ReadRequirement": "Mandatory",
+      "PropertyRequirements": {
+        "CertificateLocations": {
+          "ReadRequirement": "Mandatory"
+        }
+      },
+      "ActionRequirements": {
+        "GenerateCSR": {
+          "ReadRequirement": "Recommended"
+        },
+        "ReplaceCertificate": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "SecureBoot": {
+      "ReadRequirement": "Recommended",
+      "Purpose": "Neocloud-Trusted. Boot integrity; present on Supermicro ComputerSystem [rec].",
+      "PropertyRequirements": {
+        "SecureBootEnable": {
+          "ReadRequirement": "Recommended"
+        },
+        "SecureBootCurrentBoot": {
+          "ReadRequirement": "Recommended"
+        },
+        "SecureBootMode": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "ComponentIntegrity": {
+      "ReadRequirement": "Recommended",
+      "Purpose": "Neocloud-Trusted. SPDM/TPM attestation of GPUs, NICs, baseboards. An audit job, not a scrape: attestation is pass/fail, not a time series [rec].",
+      "PropertyRequirements": {
+        "ComponentIntegrityType": {
+          "ReadRequirement": "Mandatory"
+        },
+        "ComponentIntegrityEnabled": {
+          "ReadRequirement": "Mandatory"
+        },
+        "TargetComponentURI": {
+          "ReadRequirement": "Mandatory"
+        },
+        "SPDM": {
+          "ReadRequirement": "Recommended"
+        },
+        "Status": {
+          "ReadRequirement": "Recommended"
+        }
+      },
+      "ActionRequirements": {
+        "SPDMGetSignedMeasurements": {
+          "ReadRequirement": "Recommended"
+        }
+      }
+    },
+    "OutboundConnection": {
+      "ReadRequirement": "Recommended",
+      "Purpose": "Neocloud-Trusted. BMC-initiated mTLS call-home for management networks without inbound reachability (DSP0266 s12.10); today collection runs from a runner inside the BMC plane because nothing else can reach it [live]."
+    }
+  },
+  "Registries": {
+    "Base": {
+      "MinVersion": "1.0.0",
+      "Repository": "redfish.dmtf.org/registries",
+      "Messages": {}
+    }
+  }
+}

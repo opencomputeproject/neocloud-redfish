@@ -1,0 +1,175 @@
+{
+  "@Redfish.Copyright": "Copyright 2026 Open Compute Project. Released under CC-BY-SA-4.0.",
+  "@odata.type": "#MessageRegistry.v1_6_2.MessageRegistry",
+  "Id": "OCPAcceleratorRAS.1.0.0",
+  "Name": "OCP Accelerator RAS Message Registry",
+  "Language": "en",
+  "Description": "Standardized Redfish messages for accelerator (GPU, HBM, NVSwitch, accelerator management controller) RAS events. Gives neutral MessageIds to conditions that today arrive as vendor free text or as Oem counters. Link/port events are deliberately left to the OCP AcceleratorFabric registry (ocp-hm-system-gpu-management). DRAFT: the vendor code mapping (NVIDIA XID/SXID, AMD equivalents) is the open work item with the OCP System GPU Management workstream.",
+  "RegistryPrefix": "OCPAcceleratorRAS",
+  "RegistryVersion": "1.0.0",
+  "OwningEntity": "Open Compute Project",
+  "Messages": {
+    "AcceleratorSubsystemUnavailable": {
+      "Description": "The accelerator management controller or subsystem stopped answering while the host BMC remained healthy.",
+      "Message": "Accelerator subsystem '%1' managed by '%2' is unavailable.",
+      "Severity": "Critical",
+      "MessageSeverity": "Critical",
+      "NumberOfArgs": 2,
+      "ParamTypes": [
+        "string",
+        "string"
+      ],
+      "Resolution": "Check tray power, cabling and the accelerator management controller. Do not schedule accelerator work on this node until the subsystem is restored. Observed twice in six weeks on one fleet; without this event one occurrence went unnoticed nine days."
+    },
+    "AcceleratorSubsystemRestored": {
+      "Description": "The accelerator subsystem is answering again.",
+      "Message": "Accelerator subsystem '%1' managed by '%2' is available.",
+      "Severity": "OK",
+      "MessageSeverity": "OK",
+      "NumberOfArgs": 2,
+      "ParamTypes": [
+        "string",
+        "string"
+      ],
+      "Resolution": "None."
+    },
+    "GPUXidError": {
+      "Description": "A GPU reported an NVIDIA XID error.",
+      "Message": "GPU '%1' reported XID error %2: %3.",
+      "Severity": "Critical",
+      "MessageSeverity": "Critical",
+      "NumberOfArgs": 3,
+      "ParamTypes": [
+        "string",
+        "number",
+        "string"
+      ],
+      "Resolution": "Correlate the XID code with the NVIDIA XID reference. Drain and diagnose the node; replace the GPU if the fault is persistent or uncorrectable."
+    },
+    "NVSwitchSxidError": {
+      "Description": "An NVSwitch reported an SXID error.",
+      "Message": "NVSwitch '%1' reported SXID error %2: %3.",
+      "Severity": "Critical",
+      "MessageSeverity": "Critical",
+      "NumberOfArgs": 3,
+      "ParamTypes": [
+        "string",
+        "number",
+        "string"
+      ],
+      "Resolution": "Assess NVLink fabric blast radius; drain affected GPUs and diagnose the NVSwitch."
+    },
+    "HBMUncorrectableECC": {
+      "Description": "An accelerator's HBM lifetime uncorrectable ECC count increased.",
+      "Message": "GPU '%1' HBM uncorrectable ECC errors increased to %2.",
+      "Severity": "Critical",
+      "MessageSeverity": "Critical",
+      "NumberOfArgs": 2,
+      "ParamTypes": [
+        "string",
+        "number"
+      ],
+      "Resolution": "Hard memory fault. Take the GPU out of service and run vendor diagnostics; replace if the count keeps rising."
+    },
+    "HBMCorrectableECCRateHigh": {
+      "Description": "An accelerator's HBM correctable ECC rate exceeded the operator's threshold.",
+      "Message": "GPU '%1' HBM correctable ECC errors increased by %2 in the last %3 minutes.",
+      "Severity": "Warning",
+      "MessageSeverity": "Warning",
+      "NumberOfArgs": 3,
+      "ParamTypes": [
+        "string",
+        "number",
+        "number"
+      ],
+      "Resolution": "Watch for row remapping; schedule a reset in the next maintenance window if remaps are pending."
+    },
+    "GPURowRemappingPending": {
+      "Description": "A GPU has a pending HBM row remapping that requires a reset to take effect.",
+      "Message": "GPU '%1' has a pending memory row remapping.",
+      "Severity": "Warning",
+      "MessageSeverity": "Warning",
+      "NumberOfArgs": 1,
+      "ParamTypes": [
+        "string"
+      ],
+      "Resolution": "Schedule a GPU reset during the next maintenance window to apply the remapping."
+    },
+    "GPURowRemappingFailure": {
+      "Description": "A GPU HBM row remapping operation failed.",
+      "Message": "GPU '%1' memory row remapping failed.",
+      "Severity": "Critical",
+      "MessageSeverity": "Critical",
+      "NumberOfArgs": 1,
+      "ParamTypes": [
+        "string"
+      ],
+      "Resolution": "Drain the node and replace the GPU."
+    },
+    "GPURowRemapCapacityExhausted": {
+      "Description": "One or more HBM banks on a GPU have no remap capacity left.",
+      "Message": "GPU '%1' has %2 HBM banks with no remaining row-remap capacity.",
+      "Severity": "Warning",
+      "MessageSeverity": "Warning",
+      "NumberOfArgs": 2,
+      "ParamTypes": [
+        "string",
+        "number"
+      ],
+      "Resolution": "The next uncorrectable error in an exhausted bank cannot be remapped. Treat the GPU as an RMA candidate."
+    },
+    "GPUFellOffBus": {
+      "Description": "A GPU is no longer present on the PCIe bus.",
+      "Message": "GPU '%1' is no longer responding on the PCIe bus.",
+      "Severity": "Critical",
+      "MessageSeverity": "Critical",
+      "NumberOfArgs": 1,
+      "ParamTypes": [
+        "string"
+      ],
+      "Resolution": "Drain the node; check PCIe AER counters and reseat or replace the GPU."
+    },
+    "GPUPCIeLinkDegraded": {
+      "Description": "A GPU's negotiated PCIe link is narrower or slower than its maximum.",
+      "Message": "GPU '%1' PCIe link is %2 lanes at %3 (maximum %4 lanes at %5).",
+      "Severity": "Warning",
+      "MessageSeverity": "Warning",
+      "NumberOfArgs": 5,
+      "ParamTypes": [
+        "string",
+        "number",
+        "string",
+        "number",
+        "string"
+      ],
+      "Resolution": "A degraded link halves host-to-GPU bandwidth silently. Check retimers and reseat; a link at 0 lanes with the device still enumerated is a bus drop."
+    },
+    "GPUThrottledSustained": {
+      "Description": "A GPU spent more than the operator's threshold of wall-clock time throttled for a thermal or hardware-violation reason.",
+      "Message": "GPU '%1' was throttled for reason '%2' for %3 percent of the last %4 minutes.",
+      "Severity": "Warning",
+      "MessageSeverity": "Warning",
+      "NumberOfArgs": 4,
+      "ParamTypes": [
+        "string",
+        "string",
+        "number",
+        "number"
+      ],
+      "Resolution": "Power-cap throttling under a configured cap is expected; thermal or hardware-violation throttling indicates cooling or a hardware fault."
+    },
+    "MetricValueStale": {
+      "Description": "The management controller flagged a telemetry value as stale.",
+      "Message": "Metric '%1' on '%2' is stale; last update %3.",
+      "Severity": "Warning",
+      "MessageSeverity": "Warning",
+      "NumberOfArgs": 3,
+      "ParamTypes": [
+        "string",
+        "string",
+        "string"
+      ],
+      "Resolution": "Do not record the value. If a whole report is stale, treat the accelerator subsystem as degraded."
+    }
+  }
+}

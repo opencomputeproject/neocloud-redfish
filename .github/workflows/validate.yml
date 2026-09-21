@@ -1,0 +1,42 @@
+name: validate-profiles
+on: [push, pull_request]
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Regenerate profiles and check they are committed
+        run: |
+          python build_profiles.py
+          git diff --exit-code -- profiles registries
+      - name: Install the DMTF validator (carries the DSP0272 profile schema)
+        run: pip install redfish_interop_validator jsonschema
+      - name: Work around Redfish-Interop-Validator 3.0.0 UseCaseType crash (get_resource_data -> get_resource)
+        run: |
+          P=$(python -c "import redfish_interop_validator,os; print(os.path.dirname(redfish_interop_validator.__file__))")
+          sed -i "s/sut.get_resource_data(parent_uri)/sut.get_resource(parent_uri)/" "$P/profile.py"
+      - name: Every profile in the family and every composed upstream profile conforms to the DSP0272 schema
+        run: |
+          python - <<'PY'
+          import json, glob, sys, jsonschema
+          from redfish_interop_validator import profile_schema
+          schema = [v for v in vars(profile_schema).values() if isinstance(v, dict) and "definitions" in v][0]
+          bad = 0
+          for p in sorted(glob.glob("profiles/*.json") + glob.glob("profiles/upstream/*.json")):
+              errs = list(jsonschema.Draft7Validator(schema).iter_errors(json.load(open(p))))
+              print(("FAIL " if errs else "ok   ") + p)
+              for e in errs[:5]: print("   ", "/".join(map(str, e.absolute_path)), e.message[:160])
+              bad += bool(errs)
+          sys.exit(bad)
+          PY
+      - name: Smoke-run the validator against the DMTF public mockup bundle (schema and composition only)
+        run: |
+          git clone --depth 1 https://github.com/DMTF/Redfish-Mockup-Server mock
+          git clone --depth 1 https://github.com/DMTF/Redfish-Mockup-Bundle bundle || true
+          MOCK=$(ls -d bundle/public-rackmount1 2>/dev/null || ls -d mock/public-rackmount1 2>/dev/null || true)
+          if [ -n "$MOCK" ]; then MOCKUP_SERVER=mock/redfishMockupServer.py tools/run-validator.sh profiles/OCPNeocloudPlatform.v0_6_0.json "$MOCK"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: validator-reports, path: logs/ }
